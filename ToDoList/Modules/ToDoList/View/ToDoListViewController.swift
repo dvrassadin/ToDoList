@@ -7,16 +7,22 @@
 
 import UIKit
 
-protocol DefaultToDoListView: AnyObject {
-    
+@MainActor
+protocol ToDoListViewProtocol: AnyObject {
+    func displayToDos(_ toDos: [ToDo])
+    func displayError(message: String)
+    func showLoading()
+    func hideLoading()
 }
 
-final class ToDoListViewController: UIViewController {
+final class ToDoListViewController: UIViewController, ToDoListViewProtocol {
     
     // MARK: Properties
     
+    var presenter: ToDoListPresenterProtocol!
+    
     private lazy var contentView = ToDoListView()
-    private lazy var dataSource = makeDataSource()
+    private lazy var dataSource: UITableViewDiffableDataSource<Int, ToDo> = makeDataSource()
 
     // MARK: Lifecycle
     
@@ -26,17 +32,25 @@ final class ToDoListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        DummyJSONNetworkService.shared.getToDos { result in
-            switch result {
-            case .success(let toDos):
-                DispatchQueue.main.async {
-                    let toDos = toDos.todos.map { ToDo(apiToDo: $0) }
-                    self.applySnapshot(toDos: toDos)
-                }
-            case .failure:
-                break
-            }
-        }
+        presenter.viewDidLoad()
+    }
+    
+    // MARK: Public Methods
+    
+    func displayToDos(_ toDos: [ToDo]) {
+        self.applySnapshot(toDos: toDos)
+    }
+    
+    func displayError(message: String) {
+        // TODO: Implement error alert
+    }
+    
+    func showLoading() {
+        // TODO: Implement showing activity indicator
+    }
+    
+    func hideLoading() {
+        // TODO: Implement hiding activity indicator
     }
     
     // MARK: Diffable Data Source

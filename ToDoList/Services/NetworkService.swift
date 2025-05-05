@@ -7,8 +7,7 @@
 
 import OSLog
 
-@MainActor
-protocol NetworkService {
+protocol NetworkService: Sendable {
     func getToDos(completion: @escaping @Sendable (Result<APIToDos, NetworkError>) -> Void)
 }
 

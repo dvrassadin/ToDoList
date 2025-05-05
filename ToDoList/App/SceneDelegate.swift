@@ -20,7 +20,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = ToDoListViewController()
+        window?.rootViewController = ToDoListRouter.createModule()
         window?.overrideUserInterfaceStyle = .light
         window?.backgroundColor = .Brand.black
         window?.makeKeyAndVisible()
