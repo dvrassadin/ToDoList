@@ -14,4 +14,5 @@ protocol StorageManager {
     func saveToDos(_ toDos: [ToDo])
     func fetchToDos(completion: @escaping @Sendable ([ToDo]) -> Void)
     func fetchToDos(matching query: String, completion: @escaping @Sendable ([ToDo]) -> Void)
+    func deleteToDo(withID id: Int, completion: @escaping () -> Void)
 }

@@ -149,7 +149,10 @@ extension ToDoListViewController: UITableViewDelegate {
                 image: UIImage(systemName: "trash"),
                 attributes: .destructive
             ) { _ in
-                // TODO: Implement deleting
+                self.presenter.didRequestDeleteToDo(
+                    withID: toDo.id,
+                    searchText: self.searchController.searchBar.text
+                )
             }
             
             return UIMenu(children: [edit, share, delete])
@@ -175,5 +178,9 @@ extension ToDoListViewController: UITableViewDelegate {
 extension ToDoListViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         presenter.didEnterSearchText(searchText)
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        presenter.didCancelSearch()
     }
 }

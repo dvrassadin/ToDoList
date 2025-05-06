@@ -130,4 +130,25 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
         }
     }
     
+    func deleteToDo(withID id: Int, completion: @escaping () -> Void) {
+        persistentContainer.performBackgroundTask { [weak self] backgroundContext in
+            let fetchRequest = CoreDataToDo.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "id == %d", id)
+            
+            do {
+                let toDosToDelete = try backgroundContext.fetch(fetchRequest)
+                if !toDosToDelete.isEmpty {
+                    toDosToDelete.forEach { backgroundContext.delete($0) }
+                    try backgroundContext.save()
+                    self?.logger.info("ToDo with ID \(id) deleted.")
+                } else {
+                    self?.logger.warning("No ToDo found with ID \(id) to delete.")
+                }
+            } catch {
+                self?.logger.error("Failed to delete ToDo with ID \(id): \(error.localizedDescription)")
+            }
+            completion()
+        }
+    }
+    
 }

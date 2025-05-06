@@ -10,6 +10,8 @@ import Foundation
 protocol ToDoListPresenterProtocol: Sendable {
     func viewDidLoad()
     func didEnterSearchText(_ text: String?)
+    func didCancelSearch()
+    func didRequestDeleteToDo(withID id: Int, searchText: String?)
 }
 
 protocol ToDoListInteractorOutputProtocol: AnyObject, Sendable {
@@ -41,6 +43,14 @@ final class ToDoListPresenter: ToDoListPresenterProtocol, ToDoListInteractorOutp
     
     func didEnterSearchText(_ text: String?) {
         interactor.searchToDos(with: text ?? "")
+    }
+    
+    func didCancelSearch() {
+        interactor.fetchToDos()
+    }
+    
+    func didRequestDeleteToDo(withID id: Int, searchText: String?) {
+        interactor.deleteToDo(withId: id, searchText: searchText ?? "")
     }
     
     // MARK: ToDoListInteractorOutputProtocol Methods

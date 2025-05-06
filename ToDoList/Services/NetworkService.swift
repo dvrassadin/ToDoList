@@ -8,7 +8,7 @@
 import OSLog
 
 protocol NetworkService: Sendable {
-    func getToDos(completion: @escaping @Sendable (Result<APIToDos, NetworkError>) -> Void)
+    func getToDos(completion: @escaping @Sendable (Result<[ToDo], NetworkError>) -> Void)
 }
 
 final class DummyJSONNetworkService: NetworkService {
@@ -43,7 +43,7 @@ final class DummyJSONNetworkService: NetworkService {
     
     // MARK: Public Methods
     
-    func getToDos(completion: @escaping @Sendable (Result<APIToDos, NetworkError>) -> Void) {
+    func getToDos(completion: @escaping @Sendable (Result<[ToDo], NetworkError>) -> Void) {
         let url = baseURL.appendingPathComponent("todos")
         
         logger.info("Starting request: \(url.absoluteString)")
@@ -74,9 +74,10 @@ final class DummyJSONNetworkService: NetworkService {
             }
             
             do {
-                let toDos = try self.decoder.decode(APIToDos.self, from: data)
-                logger.info("Received \(toDos.todos.count) to-do items for request: \(url.absoluteString)")
-                completion(.success(toDos))
+                let apiToDos = try self.decoder.decode(APIToDos.self, from: data)
+                logger.info("Received \(apiToDos.todos.count) to-do items for request: \(url.absoluteString)")
+                let domainToDos = apiToDos.todos.map { ToDo(apiToDo: $0) }
+                completion(.success(domainToDos))
             } catch {
                 logger.error("Failed to decode JSON for request: \(url.absoluteString)")
                 completion(.failure(.decodingError(error)))

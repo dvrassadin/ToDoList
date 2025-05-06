@@ -10,6 +10,7 @@ import Foundation
 protocol ToDoListInteractorInputProtocol: Sendable {
     func fetchToDos()
     func searchToDos(with query: String)
+    func deleteToDo(withId id: Int, searchText: String)
 }
 
 final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Sendable {
@@ -48,8 +49,7 @@ final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Send
                 networkService.getToDos { [weak self] result in
                     guard let self else { return }
                     switch result {
-                    case .success(let apiToDos):
-                        let toDos = apiToDos.todos.map { ToDo(apiToDo: $0) }
+                    case .success(let toDos):
                         presenter?.didFetchToDos(toDos)
                         storageManger.saveToDos(toDos)
                         userDefaultsManager.hasLoadedTodos = true
@@ -68,6 +68,14 @@ final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Send
     func searchToDos(with query: String) {
         storageManger.fetchToDos(matching: query) { [weak self] toDos in
             self?.presenter?.didFetchToDos(toDos)
+        }
+    }
+    
+    func deleteToDo(withId id: Int, searchText: String) {
+        storageManger.deleteToDo(withID: id) { [weak self] in
+            self?.storageManger.fetchToDos(matching: searchText) { [weak self] toDos in
+                self?.presenter?.didFetchToDos(toDos)
+            }
         }
     }
     
