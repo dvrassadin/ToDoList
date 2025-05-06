@@ -7,12 +7,11 @@
 
 import Foundation
 
-@MainActor
-protocol UserDefaultsManager {
+protocol UserDefaultsManager: AnyObject {
     var hasLoadedTodos: Bool { get set }
 }
 
-final class DefaultUserDefaultsManager: UserDefaultsManager {
+final class DefaultUserDefaultsManager: UserDefaultsManager, @unchecked Sendable {
     
     static let shared = DefaultUserDefaultsManager()
     

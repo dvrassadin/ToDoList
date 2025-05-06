@@ -38,6 +38,7 @@ final class ToDoListViewController: UIViewController, ToDoListViewProtocol {
         super.viewDidLoad()
         setupNavigationBar()
         presenter.viewDidLoad()
+        contentView.tableView.delegate = self
     }
     
     // MARK: Public Methods
@@ -81,6 +82,7 @@ final class ToDoListViewController: UIViewController, ToDoListViewProtocol {
         searchController.searchBar.searchTextField.rightViewMode = .always
         searchController.searchBar.searchTextField.rightView = view
         searchController.searchBar.searchTextField.leftView?.tintColor = .Brand.white.withAlphaComponent(0.5)
+        searchController.searchBar.delegate = self
     }
     
     // MARK: Diffable Data Source
@@ -108,4 +110,20 @@ final class ToDoListViewController: UIViewController, ToDoListViewProtocol {
             }
     }
 
+}
+
+// MARK: - UITableViewDelegate
+
+extension ToDoListViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+}
+
+// MARK: UISearchBarDelegate
+
+extension ToDoListViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        presenter.didEnterSearchText(searchText)
+    }
 }

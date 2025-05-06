@@ -8,7 +8,8 @@
 import Foundation
 
 protocol ToDoListInteractorInputProtocol: Sendable {
-    func fetchTasks()
+    func fetchToDos()
+    func searchToDos(with query: String)
 }
 
 final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Sendable {
@@ -17,6 +18,7 @@ final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Send
     
     private let networkService: NetworkService
     private let userDefaultsManager: UserDefaultsManager
+    private let storageManger: StorageManager
     
     private weak var presenter: ToDoListInteractorOutputProtocol?
     
@@ -27,28 +29,45 @@ final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Send
     init(
         networkService: NetworkService,
         userDefaultsManager: UserDefaultsManager,
+        storageManger: StorageManager,
         presenter: ToDoListInteractorOutputProtocol
     ) {
         self.networkService = networkService
         self.userDefaultsManager = userDefaultsManager
+        self.storageManger = storageManger
         self.presenter = presenter
     }
     
     // MARK: Public Methods
     
-    func fetchTasks() {
-        backgroundQueue.async { [weak self] in
-            guard let self else { return }
-            
-            networkService.getToDos { [weak self] result in
-                switch result {
-                case .success(let apiToDos):
-                    let toDos = apiToDos.todos.map { ToDo(apiToDo: $0) }
-                    self?.presenter?.didFetchToDos(toDos)
-                case .failure(let error):
-                    self?.presenter?.didFailToFetchTodos(error: error)
+    func fetchToDos() {
+        if !userDefaultsManager.hasLoadedTodos {
+            backgroundQueue.async { [weak self] in
+                guard let self else { return }
+                
+                networkService.getToDos { [weak self] result in
+                    guard let self else { return }
+                    switch result {
+                    case .success(let apiToDos):
+                        let toDos = apiToDos.todos.map { ToDo(apiToDo: $0) }
+                        presenter?.didFetchToDos(toDos)
+                        storageManger.saveToDos(toDos)
+                        userDefaultsManager.hasLoadedTodos = true
+                    case .failure(let error):
+                        presenter?.didFailToFetchTodos(error: error)
+                    }
                 }
             }
+        } else {
+            storageManger.fetchToDos { [weak self] toDos in
+                self?.presenter?.didFetchToDos(toDos)
+            }
+        }
+    }
+    
+    func searchToDos(with query: String) {
+        storageManger.fetchToDos(matching: query) { [weak self] toDos in
+            self?.presenter?.didFetchToDos(toDos)
         }
     }
     

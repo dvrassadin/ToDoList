@@ -20,9 +20,11 @@ final class ToDoListRouter: ToDoListRouterProtocol {
         let presenter = ToDoListPresenter(view: viewController)
         let networkService = DummyJSONNetworkService.shared
         let userDefaultsManager = DefaultUserDefaultsManager.shared
+        let storageManager = CoreDataStack.shared
         let interactor = ToDoListInteractor(
             networkService: networkService,
             userDefaultsManager: userDefaultsManager,
+            storageManger: storageManager,
             presenter: presenter
         )
         

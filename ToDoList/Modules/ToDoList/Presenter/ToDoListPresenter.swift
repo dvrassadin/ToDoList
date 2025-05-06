@@ -9,6 +9,7 @@ import Foundation
 
 protocol ToDoListPresenterProtocol: Sendable {
     func viewDidLoad()
+    func didEnterSearchText(_ text: String?)
 }
 
 protocol ToDoListInteractorOutputProtocol: AnyObject, Sendable {
@@ -35,7 +36,11 @@ final class ToDoListPresenter: ToDoListPresenterProtocol, ToDoListInteractorOutp
         Task { @MainActor in
             view?.showLoading()
         }
-        interactor.fetchTasks()
+        interactor.fetchToDos()
+    }
+    
+    func didEnterSearchText(_ text: String?) {
+        interactor.searchToDos(with: text ?? "")
     }
     
     // MARK: ToDoListInteractorOutputProtocol Methods
