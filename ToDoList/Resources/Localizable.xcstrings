@@ -1,0 +1,46 @@
+{
+  "sourceLanguage" : "ru",
+  "strings" : {
+    "%lld Задач" : {
+      "localizations" : {
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Задачи"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Задач"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Задача"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "%lld Задач"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Задачи" : {
+
+    },
+    "Поиск" : {
+
+    }
+  },
+  "version" : "1.0"
+}

@@ -23,6 +23,10 @@ final class ToDoListViewController: UIViewController, ToDoListViewProtocol {
     
     private lazy var contentView = ToDoListView()
     private lazy var dataSource: UITableViewDiffableDataSource<Int, ToDo> = makeDataSource()
+    
+    // MARK: UI Components
+    
+    private let searchController = UISearchController(searchResultsController: nil)
 
     // MARK: Lifecycle
     
@@ -32,6 +36,7 @@ final class ToDoListViewController: UIViewController, ToDoListViewProtocol {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupNavigationBar()
         presenter.viewDidLoad()
     }
     
@@ -39,6 +44,7 @@ final class ToDoListViewController: UIViewController, ToDoListViewProtocol {
     
     func displayToDos(_ toDos: [ToDo]) {
         self.applySnapshot(toDos: toDos)
+        contentView.countLabel.text = String(localized: "\(toDos.count) Задач")
     }
     
     func displayError(message: String) {
@@ -46,11 +52,35 @@ final class ToDoListViewController: UIViewController, ToDoListViewProtocol {
     }
     
     func showLoading() {
-        // TODO: Implement showing activity indicator
+        contentView.activityIndicator.startAnimating()
     }
     
     func hideLoading() {
-        // TODO: Implement hiding activity indicator
+        contentView.activityIndicator.stopAnimating()
+    }
+    
+    // MARK: Setup Navigation Bar
+    
+    private func setupNavigationBar() {
+        navigationItem.title = String(localized: "Задачи")
+        navigationItem.searchController = searchController
+        setupSearchBar()
+    }
+    
+    private func setupSearchBar() {
+        let view = UIView()
+        view.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+        view.backgroundColor = .systemMint
+        searchController.searchBar.searchTextField.backgroundColor = .Brand.gray
+        searchController.searchBar.searchTextField.textColor = .Brand.white
+        searchController.searchBar.searchTextField.tintColor = .Brand.white
+        searchController.searchBar.searchTextField.attributedPlaceholder = NSAttributedString(
+            string: String(localized: "Поиск"),
+            attributes: [.foregroundColor: UIColor.Brand.white.withAlphaComponent(0.5)]
+        )
+        searchController.searchBar.searchTextField.rightViewMode = .always
+        searchController.searchBar.searchTextField.rightView = view
+        searchController.searchBar.searchTextField.leftView?.tintColor = .Brand.white.withAlphaComponent(0.5)
     }
     
     // MARK: Diffable Data Source
@@ -70,6 +100,9 @@ final class ToDoListViewController: UIViewController, ToDoListViewProtocol {
                 ) as? ToDoTableViewCell
                 
                 cell?.setToDo(toDo)
+                cell?.separatorView.isHidden = indexPath.row == tableView.numberOfRows(
+                    inSection: indexPath.section
+                ) - 1
                 
                 return cell
             }

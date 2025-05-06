@@ -16,6 +16,7 @@ final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Send
     // MARK: Properties
     
     private let networkService: NetworkService
+    private let userDefaultsManager: UserDefaultsManager
     
     private weak var presenter: ToDoListInteractorOutputProtocol?
     
@@ -23,8 +24,13 @@ final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Send
     
     // MARK: Initialization
     
-    init(networkService: NetworkService, presenter: ToDoListInteractorOutputProtocol) {
+    init(
+        networkService: NetworkService,
+        userDefaultsManager: UserDefaultsManager,
+        presenter: ToDoListInteractorOutputProtocol
+    ) {
         self.networkService = networkService
+        self.userDefaultsManager = userDefaultsManager
         self.presenter = presenter
     }
     

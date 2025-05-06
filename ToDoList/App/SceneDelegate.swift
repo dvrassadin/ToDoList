@@ -19,8 +19,13 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
+        setupNavigationBar()
+        
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = ToDoListRouter.createModule()
+        let viewController = ToDoListRouter.createModule()
+        let navigationController = UINavigationController(rootViewController: viewController)
+        navigationController.navigationBar.prefersLargeTitles = true
+        window?.rootViewController = navigationController
         window?.overrideUserInterfaceStyle = .light
         window?.backgroundColor = .Brand.black
         window?.makeKeyAndVisible()
@@ -52,6 +57,18 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
+    }
+    
+    private func setupNavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .clear
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.Brand.white]
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.Brand.white]
+        
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+        UINavigationBar.appearance().compactAppearance = appearance
     }
 
 }

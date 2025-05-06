@@ -19,7 +19,12 @@ final class ToDoListRouter: ToDoListRouterProtocol {
         
         let presenter = ToDoListPresenter(view: viewController)
         let networkService = DummyJSONNetworkService.shared
-        let interactor = ToDoListInteractor(networkService: networkService, presenter: presenter)
+        let userDefaultsManager = DefaultUserDefaultsManager.shared
+        let interactor = ToDoListInteractor(
+            networkService: networkService,
+            userDefaultsManager: userDefaultsManager,
+            presenter: presenter
+        )
         
         viewController.presenter = presenter
         presenter.interactor = interactor
