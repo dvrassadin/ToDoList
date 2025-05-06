@@ -173,7 +173,7 @@ extension ToDoListViewController: UITableViewDelegate {
     }
 }
 
-// MARK: UISearchBarDelegate
+// MARK: - UISearchBarDelegate
 
 extension ToDoListViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {

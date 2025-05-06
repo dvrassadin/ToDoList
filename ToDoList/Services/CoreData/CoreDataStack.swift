@@ -142,7 +142,7 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
                     try backgroundContext.save()
                     self?.logger.info("ToDo with ID \(id) deleted.")
                 } else {
-                    self?.logger.warning("No ToDo found with ID \(id) to delete.")
+                    self?.logger.error("No ToDo found with ID \(id) to delete.")
                 }
             } catch {
                 self?.logger.error("Failed to delete ToDo with ID \(id): \(error.localizedDescription)")
