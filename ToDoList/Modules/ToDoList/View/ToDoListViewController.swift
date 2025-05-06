@@ -118,6 +118,56 @@ extension ToDoListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    
+    func tableView(
+        _ tableView: UITableView,
+        contextMenuConfigurationForRowAt indexPath: IndexPath,
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        guard let toDo = dataSource.itemIdentifier(for: indexPath) else { return nil }
+        
+        return UIContextMenuConfiguration {
+            ToDoPreviewViewController(todo: toDo)
+        } actionProvider: { _ in
+            let edit = UIAction(
+                title: String(localized: "Редактировать"),
+                image: UIImage(systemName: "pencil")
+            ) { _ in
+                // TODO: Implement Add/Edit screen opening
+            }
+            
+            let share = UIAction(
+                title: String(localized: "Поделиться"),
+                image: UIImage(systemName: "square.and.arrow.up"),
+                attributes: .disabled // FIXME: Delete attribute after sharing implementation
+            ) { _ in
+                // TODO: Implement sharing
+            }
+            
+            let delete = UIAction(
+                title: String(localized: "Удалить"),
+                image: UIImage(systemName: "trash"),
+                attributes: .destructive
+            ) { _ in
+                // TODO: Implement deleting
+            }
+            
+            return UIMenu(children: [edit, share, delete])
+        }
+    }
+    
+    func tableView(
+        _ tableView: UITableView,
+        willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
+        animator: UIContextMenuInteractionCommitAnimating
+    ) {
+        // TODO: Implement AddEditVC opening
+//        animator.addCompletion {
+//            if let previewVC = animator.previewViewController {
+//                self.navigationController?.pushViewController(previewVC, animated: true)
+//            }
+//        }
+    }
 }
 
 // MARK: UISearchBarDelegate

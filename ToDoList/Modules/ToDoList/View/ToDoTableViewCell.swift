@@ -66,7 +66,8 @@ final class ToDoTableViewCell: UITableViewCell {
     // MARK: UI Setup
     
     private func setupUI() {
-        backgroundColor = .clear
+        backgroundColor = .Brand.black
+        selectionStyle = .none
         
         contentView.addSubview(completeButton)
         contentView.addSubview(titleLabel)
@@ -112,7 +113,7 @@ final class ToDoTableViewCell: UITableViewCell {
             separatorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
     }
-    
+
     // MARK: Configure Data
     
     func setToDo(_ toDo: ToDo) {
