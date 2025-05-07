@@ -11,7 +11,6 @@ struct APIToDos: Decodable {
     let todos: [Self.ToDo]
     
     struct ToDo: Decodable {
-        let id: Int
         let todo: String
         let completed: Bool
     }

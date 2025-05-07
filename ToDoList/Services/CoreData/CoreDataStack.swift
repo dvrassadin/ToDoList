@@ -40,7 +40,7 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
         persistentContainer.performBackgroundTask { [weak self] backgroundContext in
             toDos.forEach { toDo in
                 let coreDataToDo = CoreDataToDo(context: backgroundContext)
-                coreDataToDo.id = Int64(toDo.id)
+                coreDataToDo.id = toDo.id
                 coreDataToDo.title = toDo.title
                 coreDataToDo.text = toDo.text
                 coreDataToDo.created = toDo.created
@@ -59,7 +59,7 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
     func saveToDo(_ toDo: ToDo, completion: @escaping () -> Void) {
         persistentContainer.performBackgroundTask { [weak self] backgroundContext in
             let request = CoreDataToDo.fetchRequest()
-            request.predicate = NSPredicate(format: "id == %d", toDo.id)
+            request.predicate = NSPredicate(format: "id == %@", toDo.id as CVarArg)
             request.fetchLimit = 1
             
             do {
@@ -69,7 +69,7 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
                     existedToDo.text = toDo.text
                 } else {
                     let coreDataToDo = CoreDataToDo(context: backgroundContext)
-                    coreDataToDo.id = Int64(toDo.id)
+                    coreDataToDo.id = toDo.id
                     coreDataToDo.title = toDo.title
                     coreDataToDo.text = toDo.text
                     coreDataToDo.created = toDo.created
@@ -85,10 +85,10 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
         }
     }
     
-    func updateToDoCompletion(id: Int, completed: Bool, completion: @escaping () -> Void) {
+    func updateToDoCompletion(id: UUID, completed: Bool, completion: @escaping () -> Void) {
         persistentContainer.performBackgroundTask { [weak self] backgroundContext in
             let request = CoreDataToDo.fetchRequest()
-            request.predicate = NSPredicate(format: "id == %d", id)
+            request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
             request.fetchLimit = 1
             
             do {
@@ -120,7 +120,7 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
                 self?.logger.info("Fetched \(coreDataToDos.count) ToDos from CoreData.")
                 let toDos = coreDataToDos.map { coreDataToDo in
                     ToDo(
-                        id: Int(coreDataToDo.id),
+                        id: coreDataToDo.id ?? UUID(),
                         title: coreDataToDo.title,
                         text: coreDataToDo.text ?? "",
                         created: coreDataToDo.created,
@@ -151,7 +151,7 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
                 let coreDataToDos = try backgroundContext.fetch(request)
                 let toDos = coreDataToDos.map { cd in
                     ToDo(
-                        id: Int(cd.id),
+                        id: cd.id ?? UUID(),
                         title: cd.title,
                         text: cd.text ?? "",
                         created: cd.created,
@@ -167,10 +167,10 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
         }
     }
     
-    func fetchToDo(withID id: Int, completion: @escaping @Sendable (ToDo?) -> Void) {
+    func fetchToDo(withID id: UUID, completion: @escaping @Sendable (ToDo?) -> Void) {
         persistentContainer.performBackgroundTask { [weak self] backgroundContext in
             let request = CoreDataToDo.fetchRequest()
-            request.predicate = NSPredicate(format: "id == %d", Int64(id))
+            request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
             request.fetchLimit = 1
             
             do {
@@ -181,7 +181,7 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
                     return
                 }
                 let toDo = ToDo(
-                    id: Int(coreDataToDo.id),
+                    id: coreDataToDo.id ?? UUID(),
                     title: coreDataToDo.title,
                     text: coreDataToDo.text ?? "",
                     created: coreDataToDo.created,
@@ -196,10 +196,10 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
         }
     }
     
-    func deleteToDo(withID id: Int, completion: @escaping () -> Void) {
+    func deleteToDo(withID id: UUID, completion: @escaping () -> Void) {
         persistentContainer.performBackgroundTask { [weak self] backgroundContext in
             let fetchRequest = CoreDataToDo.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "id == %d", id)
+            fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
             
             do {
                 let toDosToDelete = try backgroundContext.fetch(fetchRequest)
@@ -215,12 +215,6 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
             }
             completion()
         }
-    }
-    
-    // MARK: Private Methods
-    
-    private func updateExistedToDo(_ toDo: ToDo) {
-        
     }
     
 }

@@ -10,7 +10,7 @@ import UIKit
 @MainActor
 protocol ToDoListRouterProtocol {
     func navigateToAddToDo()
-    func navigateToEditToDo(withID id: Int)
+    func navigateToEditToDo(withID id: UUID)
 }
 
 final class ToDoListRouter: ToDoListRouterProtocol {
@@ -54,7 +54,7 @@ final class ToDoListRouter: ToDoListRouterProtocol {
         )
     }
     
-    func navigateToEditToDo(withID id: Int) {
+    func navigateToEditToDo(withID id: UUID) {
         let addEditViewController = AddEditToDotRouter.createModule(toDoID: id)
         viewController?.navigationController?.pushViewController(
             addEditViewController,

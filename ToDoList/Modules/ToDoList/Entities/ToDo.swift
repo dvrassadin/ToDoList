@@ -8,13 +8,13 @@
 import Foundation
 
 struct ToDo: Hashable {
-    let id: Int
+    let id: UUID
     let title: String?
     let text: String?
     let created: Date?
     var completed: Bool
     
-    init(id: Int, title: String?, text: String?, created: Date?, completed: Bool) {
+    init(id: UUID, title: String?, text: String?, created: Date?, completed: Bool) {
         self.id = id
         self.title = title
         self.text = text
@@ -23,7 +23,7 @@ struct ToDo: Hashable {
     }
     
     init(apiToDo: APIToDos.ToDo) {
-        self.id = apiToDo.id
+        self.id = UUID()
         self.title = nil
         self.text = apiToDo.todo
         self.created = nil

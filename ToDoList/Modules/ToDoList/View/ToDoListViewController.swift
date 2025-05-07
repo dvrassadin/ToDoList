@@ -137,7 +137,7 @@ extension ToDoListViewController: UITableViewDelegate {
     ) -> UIContextMenuConfiguration? {
         guard let toDo = dataSource.itemIdentifier(for: indexPath) else { return nil }
         
-        return UIContextMenuConfiguration(identifier: toDo.id as NSNumber) {
+        return UIContextMenuConfiguration(identifier: toDo.id.uuidString as NSString) {
             ToDoPreviewViewController(todo: toDo)
         } actionProvider: { _ in
             let edit = UIAction(
@@ -179,8 +179,9 @@ extension ToDoListViewController: UITableViewDelegate {
     ) {
         // TODO: Implement AddEditVC opening
         animator.addCompletion {
-            guard let id = configuration.identifier as? Int else { return }
-            self.presenter.didSelectToDo(withID: id)
+            guard let stringID = configuration.identifier as? String,
+                  let uuid = UUID(uuidString: stringID) else { return }
+            self.presenter.didSelectToDo(withID: uuid)
         }
     }
 }

@@ -24,12 +24,12 @@ final class AddEditToDoPresenter: AddEditToDoPresenterProtocol, AddEditToDoInter
     var interactor: AddEditToDoInteractorInputProtocol!
     var router: AddEditToDotRouterProtocol!
     
-    private let toDoID: Int?
+    private let toDoID: UUID?
     private var toDo: ToDo?
     
     // MARK: Initialization
     
-    init(view: AddEditToDoViewProtocol, toDoID: Int?) {
+    init(view: AddEditToDoViewProtocol, toDoID: UUID?) {
         self.view = view
         self.toDoID = toDoID
     }
@@ -39,6 +39,10 @@ final class AddEditToDoPresenter: AddEditToDoPresenterProtocol, AddEditToDoInter
     func viewDidLoad() {
         if let toDoID {
             interactor.fetchToDoForEditing(withId: toDoID)
+        } else {
+            Task { @MainActor in
+                view?.displayTaskDetails(title: nil, date: .now, text: nil)                
+            }
         }
     }
     

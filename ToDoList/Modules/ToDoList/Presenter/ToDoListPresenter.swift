@@ -10,11 +10,11 @@ import Foundation
 protocol ToDoListPresenterProtocol: Sendable {
     func viewDidLoad()
     func didTapAddTask()
-    func didSelectToDo(withID id: Int)
-    func didTapCompleteButton(id: Int, completed: Bool, searchText: String)
+    func didSelectToDo(withID id: UUID)
+    func didTapCompleteButton(id: UUID, completed: Bool, searchText: String)
     func didEnterSearchText(_ text: String?)
     func didCancelSearch()
-    func didRequestDeleteToDo(withID id: Int, searchText: String?)
+    func didRequestDeleteToDo(withID id: UUID, searchText: String?)
 }
 
 protocol ToDoListInteractorOutputProtocol: AnyObject, Sendable {
@@ -51,13 +51,13 @@ final class ToDoListPresenter: ToDoListPresenterProtocol, ToDoListInteractorOutp
         }
     }
     
-    func didSelectToDo(withID id: Int) {
+    func didSelectToDo(withID id: UUID) {
         Task { @MainActor in
             router.navigateToEditToDo(withID: id)
         }
     }
     
-    func didTapCompleteButton(id: Int, completed: Bool, searchText: String) {
+    func didTapCompleteButton(id: UUID, completed: Bool, searchText: String) {
         interactor.markToDoAsCompleted(withId: id, completed: completed, searchText: searchText)
     }
     
@@ -69,7 +69,7 @@ final class ToDoListPresenter: ToDoListPresenterProtocol, ToDoListInteractorOutp
         interactor.fetchToDos()
     }
     
-    func didRequestDeleteToDo(withID id: Int, searchText: String?) {
+    func didRequestDeleteToDo(withID id: UUID, searchText: String?) {
         interactor.deleteToDo(withId: id, searchText: searchText ?? "")
     }
     

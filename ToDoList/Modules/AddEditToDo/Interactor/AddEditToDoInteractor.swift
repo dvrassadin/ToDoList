@@ -8,7 +8,7 @@
 import Foundation
 
 protocol AddEditToDoInteractorInputProtocol: Sendable {
-    func fetchToDoForEditing(withId id: Int)
+    func fetchToDoForEditing(withId id: UUID)
     func updateToDo(_ toDo: ToDo)
 //    func addNewToDo(_ toDo: ToDo)
 }
@@ -30,7 +30,7 @@ final class AddEditToDoInteractor: AddEditToDoInteractorInputProtocol, @unchecke
     
     // MARK: Public Methods
     
-    func fetchToDoForEditing(withId id: Int) {
+    func fetchToDoForEditing(withId id: UUID) {
         storageManger.fetchToDo(withID: id) { [weak self] toDo in
             self?.presenter?.didLoadToDoForEditing(toDo)
         }
