@@ -47,9 +47,7 @@ final class AddEditToDoPresenter: AddEditToDoPresenterProtocol, AddEditToDoInter
     }
     
     func viewWillDisappear(title: String?, text: String?) {
-        if toDoID == nil {
-            
-        } else if let toDo, title != toDo.title || text != toDo.text {
+        if let toDo, title != toDo.title || text != toDo.text {
             let updatedToDo = ToDo(
                 id: toDo.id,
                 title: title,
@@ -57,7 +55,16 @@ final class AddEditToDoPresenter: AddEditToDoPresenterProtocol, AddEditToDoInter
                 created: toDo.created,
                 completed: toDo.completed
             )
-            interactor.updateToDo(updatedToDo)
+            interactor.saveToDo(updatedToDo)
+        } else if toDo == nil, (text != nil && text != "") || (title != nil && title != "") {
+            let newToDo = ToDo(
+                id: UUID(),
+                title: title,
+                text: text,
+                created: .now,
+                completed: false
+            )
+            interactor.saveToDo(newToDo)
         }
     }
     

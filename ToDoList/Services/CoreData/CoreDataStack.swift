@@ -56,7 +56,7 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
         }
     }
     
-    func saveToDo(_ toDo: ToDo, completion: @escaping () -> Void) {
+    func saveToDo(_ toDo: ToDo) {
         persistentContainer.performBackgroundTask { [weak self] backgroundContext in
             let request = CoreDataToDo.fetchRequest()
             request.predicate = NSPredicate(format: "id == %@", toDo.id as CVarArg)
@@ -80,8 +80,6 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
             } catch {
                 self?.logger.error("Failed to save To Do: \(error.localizedDescription)")
             }
-            
-            completion()
         }
     }
     
@@ -196,7 +194,7 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
         }
     }
     
-    func deleteToDo(withID id: UUID, completion: @escaping () -> Void) {
+    func deleteToDo(withID id: UUID) {
         persistentContainer.performBackgroundTask { [weak self] backgroundContext in
             let fetchRequest = CoreDataToDo.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
@@ -213,7 +211,6 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
             } catch {
                 self?.logger.error("Failed to delete ToDo with ID \(id): \(error.localizedDescription)")
             }
-            completion()
         }
     }
     

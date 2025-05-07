@@ -84,18 +84,12 @@ final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Send
     
     func markToDoAsCompleted(withId id: UUID, completed: Bool, searchText: String) {
         storageManger.updateToDoCompletion(id: id, completed: completed) { [weak self] in
-            self?.storageManger.fetchToDos(matching: searchText) { [weak self] toDos in
-                self?.presenter?.didFetchToDos(toDos)
-            }
+            self?.storageManger.fetchToDos(matching: searchText) { _ in }
         }
     }
     
     func deleteToDo(withId id: UUID, searchText: String) {
-        storageManger.deleteToDo(withID: id) { [weak self] in
-            self?.storageManger.fetchToDos(matching: searchText) { [weak self] toDos in
-                self?.presenter?.didFetchToDos(toDos)
-            }
-        }
+        storageManger.deleteToDo(withID: id)
     }
     
     // MARK: Private Methods
