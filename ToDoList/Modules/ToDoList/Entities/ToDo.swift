@@ -10,11 +10,11 @@ import Foundation
 struct ToDo: Hashable {
     let id: Int
     let title: String?
-    let text: String
+    let text: String?
     let created: Date?
     var completed: Bool
     
-    init(id: Int, title: String?, text: String, created: Date?, completed: Bool) {
+    init(id: Int, title: String?, text: String?, created: Date?, completed: Bool) {
         self.id = id
         self.title = title
         self.text = text

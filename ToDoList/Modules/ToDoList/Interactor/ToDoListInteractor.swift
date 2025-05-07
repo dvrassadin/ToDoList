@@ -26,6 +26,8 @@ final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Send
     
     private let backgroundQueue = DispatchQueue.global(qos: .userInitiated)
     
+    private var contextObserver: NSObjectProtocol?
+    
     // MARK: Initialization
     
     init(
@@ -38,6 +40,14 @@ final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Send
         self.userDefaultsManager = userDefaultsManager
         self.storageManger = storageManger
         self.presenter = presenter
+        
+        subscribeToNotifications()
+    }
+    
+    deinit {
+        if let contextObserver {
+            NotificationCenter.default.removeObserver(contextObserver)
+        }
     }
     
     // MARK: Public Methods
@@ -86,6 +96,17 @@ final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Send
                 self?.presenter?.didFetchToDos(toDos)
             }
         }
+    }
+    
+    // MARK: Private Methods
+    
+    private func subscribeToNotifications() {
+        contextObserver = NotificationCenter.default.addObserver(
+            forName: .NSManagedObjectContextDidSave,
+            object: nil,
+            queue: nil) { [weak self] _ in
+                self?.fetchToDos()
+            }
     }
     
 }

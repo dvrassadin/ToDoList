@@ -58,21 +58,31 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
     
     func saveToDo(_ toDo: ToDo, completion: @escaping () -> Void) {
         persistentContainer.performBackgroundTask { [weak self] backgroundContext in
-            let coreDataToDo = CoreDataToDo(context: backgroundContext)
-            coreDataToDo.id = Int64(toDo.id)
-            coreDataToDo.title = toDo.title
-            coreDataToDo.text = toDo.text
-            coreDataToDo.created = toDo.created
-            coreDataToDo.completed = toDo.completed
+            let request = CoreDataToDo.fetchRequest()
+            request.predicate = NSPredicate(format: "id == %d", toDo.id)
+            request.fetchLimit = 1
             
             do {
+                let results = try backgroundContext.fetch(request)
+                if let existedToDo = results.first {
+                    existedToDo.title = toDo.title
+                    existedToDo.text = toDo.text
+                } else {
+                    let coreDataToDo = CoreDataToDo(context: backgroundContext)
+                    coreDataToDo.id = Int64(toDo.id)
+                    coreDataToDo.title = toDo.title
+                    coreDataToDo.text = toDo.text
+                    coreDataToDo.created = toDo.created
+                    coreDataToDo.completed = toDo.completed
+                }
                 try backgroundContext.save()
-                self?.logger.info("ToDo saved.")
+                self?.logger.info("To Do with ID '\(toDo.id) saved.")
             } catch {
                 self?.logger.error("Failed to save To Do: \(error.localizedDescription)")
             }
+            
+            completion()
         }
-        completion()
     }
     
     func updateToDoCompletion(id: Int, completed: Bool, completion: @escaping () -> Void) {
@@ -157,6 +167,35 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
         }
     }
     
+    func fetchToDo(withID id: Int, completion: @escaping @Sendable (ToDo?) -> Void) {
+        persistentContainer.performBackgroundTask { [weak self] backgroundContext in
+            let request = CoreDataToDo.fetchRequest()
+            request.predicate = NSPredicate(format: "id == %d", Int64(id))
+            request.fetchLimit = 1
+            
+            do {
+                let results = try backgroundContext.fetch(request)
+                guard let coreDataToDo = results.first else {
+                    self?.logger.error("No ToDo found with ID '\(id)'.")
+                    completion(nil)
+                    return
+                }
+                let toDo = ToDo(
+                    id: Int(coreDataToDo.id),
+                    title: coreDataToDo.title,
+                    text: coreDataToDo.text ?? "",
+                    created: coreDataToDo.created,
+                    completed: coreDataToDo.completed
+                )
+                self?.logger.info("Fetched ToDo with ID '\(id)'.")
+                completion(toDo)
+            } catch {
+                self?.logger.error("Failed to fetch ToDo with ID '\(id)': \(error)")
+                completion(nil)
+            }
+        }
+    }
+    
     func deleteToDo(withID id: Int, completion: @escaping () -> Void) {
         persistentContainer.performBackgroundTask { [weak self] backgroundContext in
             let fetchRequest = CoreDataToDo.fetchRequest()
@@ -176,6 +215,12 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
             }
             completion()
         }
+    }
+    
+    // MARK: Private Methods
+    
+    private func updateExistedToDo(_ toDo: ToDo) {
+        
     }
     
 }

@@ -9,13 +9,29 @@ import UIKit
 
 @MainActor
 protocol AddEditToDotRouterProtocol {
-    static func createModule() -> UIViewController
+    
 }
 
-final class AddEditToDotRouter: AddEditToDotRouterProtocol {
+final class AddEditToDotRouter: AddEditToDotRouterProtocol, @unchecked Sendable {
     
-    static func createModule() -> UIViewController {
+    // MARK: Properties
+    
+    weak var viewController: UIViewController?
+    
+    // MARK: Crate Module
+    
+    static func createModule(toDoID: Int? = nil) -> UIViewController {
         let viewController = AddEditToDoViewController()
+        
+        let presenter = AddEditToDoPresenter(view: viewController, toDoID: toDoID)
+        let storageManage = CoreDataStack.shared
+        let interactor = AddEditToDoInteractor(storageManger: storageManage, presenter: presenter)
+        let router = AddEditToDotRouter()
+        
+        viewController.presenter = presenter
+        presenter.interactor = interactor
+        presenter.router = router
+        router.viewController = viewController
         
         return viewController
     }

@@ -37,8 +37,9 @@ final class ToDoListViewController: UIViewController, ToDoListViewProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNavigationBar()
-        presenter.viewDidLoad()
+        setupView()
         contentView.tableView.delegate = self
+        presenter.viewDidLoad()
     }
     
     // MARK: Public Methods
@@ -74,7 +75,6 @@ final class ToDoListViewController: UIViewController, ToDoListViewProtocol {
         view.backgroundColor = .systemMint
         searchController.searchBar.searchTextField.backgroundColor = .Brand.gray
         searchController.searchBar.searchTextField.textColor = .Brand.white
-        searchController.searchBar.searchTextField.tintColor = .Brand.white
         searchController.searchBar.searchTextField.attributedPlaceholder = NSAttributedString(
             string: String(localized: "Поиск"),
             attributes: [.foregroundColor: UIColor.Brand.white.withAlphaComponent(0.5)]
@@ -83,6 +83,14 @@ final class ToDoListViewController: UIViewController, ToDoListViewProtocol {
         searchController.searchBar.searchTextField.rightView = view
         searchController.searchBar.searchTextField.leftView?.tintColor = .Brand.white.withAlphaComponent(0.5)
         searchController.searchBar.delegate = self
+    }
+    
+    // MARK: Setup View
+    
+    private func setupView() {
+        contentView.addToDoButton.addAction(UIAction { [weak self] _ in
+            self?.presenter.didTapAddTask()
+        }, for: .touchUpInside)
     }
     
     // MARK: Diffable Data Source
@@ -117,6 +125,9 @@ final class ToDoListViewController: UIViewController, ToDoListViewProtocol {
 extension ToDoListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        if let toDo = dataSource.itemIdentifier(for: indexPath) {
+            presenter.didSelectToDo(withID: toDo.id)
+        }
     }
     
     func tableView(
@@ -126,14 +137,16 @@ extension ToDoListViewController: UITableViewDelegate {
     ) -> UIContextMenuConfiguration? {
         guard let toDo = dataSource.itemIdentifier(for: indexPath) else { return nil }
         
-        return UIContextMenuConfiguration {
+        return UIContextMenuConfiguration(identifier: toDo.id as NSNumber) {
             ToDoPreviewViewController(todo: toDo)
         } actionProvider: { _ in
             let edit = UIAction(
                 title: String(localized: "Редактировать"),
                 image: UIImage(systemName: "pencil")
             ) { _ in
-                // TODO: Implement Add/Edit screen opening
+                guard let toDo = self.dataSource.itemIdentifier(for: indexPath) else { return }
+                
+                self.presenter.didSelectToDo(withID: toDo.id)
             }
             
             let share = UIAction(
@@ -165,11 +178,10 @@ extension ToDoListViewController: UITableViewDelegate {
         animator: UIContextMenuInteractionCommitAnimating
     ) {
         // TODO: Implement AddEditVC opening
-//        animator.addCompletion {
-//            if let previewVC = animator.previewViewController {
-//                self.navigationController?.pushViewController(previewVC, animated: true)
-//            }
-//        }
+        animator.addCompletion {
+            guard let id = configuration.identifier as? Int else { return }
+            self.presenter.didSelectToDo(withID: id)
+        }
     }
 }
 

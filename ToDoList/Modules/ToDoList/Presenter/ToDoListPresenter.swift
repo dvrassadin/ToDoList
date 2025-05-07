@@ -9,6 +9,8 @@ import Foundation
 
 protocol ToDoListPresenterProtocol: Sendable {
     func viewDidLoad()
+    func didTapAddTask()
+    func didSelectToDo(withID id: Int)
     func didTapCompleteButton(id: Int, completed: Bool, searchText: String)
     func didEnterSearchText(_ text: String?)
     func didCancelSearch()
@@ -24,8 +26,9 @@ final class ToDoListPresenter: ToDoListPresenterProtocol, ToDoListInteractorOutp
     
     // MARK: Properties
     
-    var interactor: ToDoListInteractorInputProtocol!
     private weak var view: ToDoListViewProtocol?
+    var interactor: ToDoListInteractorInputProtocol!
+    var router: ToDoListRouterProtocol!
     
     // MARK: Initialization
     
@@ -40,6 +43,18 @@ final class ToDoListPresenter: ToDoListPresenterProtocol, ToDoListInteractorOutp
             view?.showLoading()
         }
         interactor.fetchToDos()
+    }
+    
+    func didTapAddTask() {
+        Task { @MainActor in
+            router.navigateToAddToDo()
+        }
+    }
+    
+    func didSelectToDo(withID id: Int) {
+        Task { @MainActor in
+            router.navigateToEditToDo(withID: id)
+        }
     }
     
     func didTapCompleteButton(id: Int, completed: Bool, searchText: String) {
