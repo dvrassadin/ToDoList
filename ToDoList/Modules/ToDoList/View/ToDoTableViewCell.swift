@@ -7,9 +7,18 @@
 
 import UIKit
 
+@MainActor
+protocol ToDoTableViewCellDelegate: AnyObject {
+    func toggleCompleted(toDo: ToDo)
+}
+
 final class ToDoTableViewCell: UITableViewCell {
     
     // MARK: Properties
+    
+    private weak var delegate: ToDoTableViewCellDelegate?
+    
+    private var toDo: ToDo?
     
     private var toDoTopToTitleBottom: NSLayoutConstraint?
     private var toDoTopToContentTop: NSLayoutConstraint?
@@ -57,6 +66,7 @@ final class ToDoTableViewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
+        setupUserInteraction()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -116,7 +126,10 @@ final class ToDoTableViewCell: UITableViewCell {
 
     // MARK: Configure Data
     
-    func setToDo(_ toDo: ToDo) {
+    func setToDo(_ toDo: ToDo, delegate: ToDoTableViewCellDelegate) {
+        self.toDo = toDo
+        self.delegate = delegate
+        
         if toDo.completed {
             completeButton.configuration?.image = UIImage(systemName: "circle")
             completeButton.configuration?.baseForegroundColor = .Brand.stroke
@@ -167,6 +180,16 @@ final class ToDoTableViewCell: UITableViewCell {
         toDoLabel.layer.opacity = 1
         dateLabel.text = nil
         separatorView.isHidden = false
+    }
+    
+    // MARK: Setup User Interaction
+    
+    private func setupUserInteraction() {
+        completeButton.addAction(UIAction { [weak self] _ in
+            guard let self, let toDo else { return }
+            
+            delegate?.toggleCompleted(toDo: toDo)
+        }, for: .touchUpInside)
     }
     
 }

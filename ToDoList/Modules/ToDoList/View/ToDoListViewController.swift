@@ -101,7 +101,7 @@ final class ToDoListViewController: UIViewController, ToDoListViewProtocol {
                     withIdentifier: ToDoTableViewCell.self.description(), for: indexPath
                 ) as? ToDoTableViewCell
                 
-                cell?.setToDo(toDo)
+                cell?.setToDo(toDo, delegate: self)
                 cell?.separatorView.isHidden = indexPath.row == tableView.numberOfRows(
                     inSection: indexPath.section
                 ) - 1
@@ -182,5 +182,17 @@ extension ToDoListViewController: UISearchBarDelegate {
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         presenter.didCancelSearch()
+    }
+}
+
+// MARK: - ToDoTableViewCellDelegate
+
+extension ToDoListViewController: ToDoTableViewCellDelegate {
+    func toggleCompleted(toDo: ToDo) {
+        presenter.didTapCompleteButton(
+            id: toDo.id,
+            completed: !toDo.completed,
+            searchText: searchController.searchBar.text ?? ""
+        )
     }
 }

@@ -9,6 +9,7 @@ import Foundation
 
 protocol ToDoListPresenterProtocol: Sendable {
     func viewDidLoad()
+    func didTapCompleteButton(id: Int, completed: Bool, searchText: String)
     func didEnterSearchText(_ text: String?)
     func didCancelSearch()
     func didRequestDeleteToDo(withID id: Int, searchText: String?)
@@ -39,6 +40,10 @@ final class ToDoListPresenter: ToDoListPresenterProtocol, ToDoListInteractorOutp
             view?.showLoading()
         }
         interactor.fetchToDos()
+    }
+    
+    func didTapCompleteButton(id: Int, completed: Bool, searchText: String) {
+        interactor.markToDoAsCompleted(withId: id, completed: completed, searchText: searchText)
     }
     
     func didEnterSearchText(_ text: String?) {

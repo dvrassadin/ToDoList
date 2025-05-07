@@ -1,5 +1,5 @@
 //
-//  AddEditTaskView.swift
+//  AddEditToDoView.swift
 //  ToDoList
 //
 //  Created by Daniil Rassadin on 4/5/25.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class AddEditTaskView: UIView {
+final class AddEditToDoView: UIView {
 
     // MARK: UI Components
     

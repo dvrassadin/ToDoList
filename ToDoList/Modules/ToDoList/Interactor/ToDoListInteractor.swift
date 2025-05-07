@@ -10,6 +10,7 @@ import Foundation
 protocol ToDoListInteractorInputProtocol: Sendable {
     func fetchToDos()
     func searchToDos(with query: String)
+    func markToDoAsCompleted(withId id: Int, completed: Bool, searchText: String)
     func deleteToDo(withId id: Int, searchText: String)
 }
 
@@ -68,6 +69,14 @@ final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Send
     func searchToDos(with query: String) {
         storageManger.fetchToDos(matching: query) { [weak self] toDos in
             self?.presenter?.didFetchToDos(toDos)
+        }
+    }
+    
+    func markToDoAsCompleted(withId id: Int, completed: Bool, searchText: String) {
+        storageManger.updateToDoCompletion(id: id, completed: completed) { [weak self] in
+            self?.storageManger.fetchToDos(matching: searchText) { [weak self] toDos in
+                self?.presenter?.didFetchToDos(toDos)
+            }
         }
     }
     

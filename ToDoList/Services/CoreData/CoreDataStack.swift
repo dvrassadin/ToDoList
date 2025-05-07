@@ -56,7 +56,7 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
         }
     }
     
-    func saveToDo(_ toDo: ToDo) {
+    func saveToDo(_ toDo: ToDo, completion: @escaping () -> Void) {
         persistentContainer.performBackgroundTask { [weak self] backgroundContext in
             let coreDataToDo = CoreDataToDo(context: backgroundContext)
             coreDataToDo.id = Int64(toDo.id)
@@ -71,6 +71,33 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
             } catch {
                 self?.logger.error("Failed to save To Do: \(error.localizedDescription)")
             }
+        }
+        completion()
+    }
+    
+    func updateToDoCompletion(id: Int, completed: Bool, completion: @escaping () -> Void) {
+        persistentContainer.performBackgroundTask { [weak self] backgroundContext in
+            let request = CoreDataToDo.fetchRequest()
+            request.predicate = NSPredicate(format: "id == %d", id)
+            request.fetchLimit = 1
+            
+            do {
+                let results = try backgroundContext.fetch(request)
+                
+                guard let toDo = results.first else {
+                    self?.logger.error("ToDo \(id) not found for update.")
+                    completion()
+                    return
+                }
+                
+                toDo.completed = completed
+                try backgroundContext.save()
+                self?.logger.info("ToDo \(id) marked as \(completed ? "completed" : "not completed").")
+            } catch {
+                self?.logger.error("Failed to update ToDo \(id): \(error.localizedDescription)")
+            }
+            
+            completion()
         }
     }
     
