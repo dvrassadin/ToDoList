@@ -10,8 +10,8 @@ import Foundation
 protocol ToDoListInteractorInputProtocol: Sendable {
     func fetchToDos()
     func searchToDos(with query: String)
-    func markToDoAsCompleted(withId id: UUID, completed: Bool, searchText: String)
-    func deleteToDo(withId id: UUID, searchText: String)
+    func markToDoAsCompleted(withId id: UUID, completed: Bool)
+    func deleteToDo(withId id: UUID)
 }
 
 final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Sendable {
@@ -27,6 +27,8 @@ final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Send
     private let backgroundQueue = DispatchQueue.global(qos: .userInitiated)
     
     private var contextObserver: NSObjectProtocol?
+    
+    private var searchText: String?
     
     // MARK: Initialization
     
@@ -53,6 +55,7 @@ final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Send
     // MARK: Public Methods
     
     func fetchToDos() {
+        searchText = nil
         if !userDefaultsManager.hasLoadedTodos {
             backgroundQueue.async { [weak self] in
                 guard let self else { return }
@@ -77,18 +80,17 @@ final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Send
     }
     
     func searchToDos(with query: String) {
+        searchText = query
         storageManger.fetchToDos(matching: query) { [weak self] toDos in
             self?.presenter?.didFetchToDos(toDos)
         }
     }
     
-    func markToDoAsCompleted(withId id: UUID, completed: Bool, searchText: String) {
-        storageManger.updateToDoCompletion(id: id, completed: completed) { [weak self] in
-            self?.storageManger.fetchToDos(matching: searchText) { _ in }
-        }
+    func markToDoAsCompleted(withId id: UUID, completed: Bool) {
+        storageManger.updateToDoCompletion(id: id, completed: completed)
     }
     
-    func deleteToDo(withId id: UUID, searchText: String) {
+    func deleteToDo(withId id: UUID) {
         storageManger.deleteToDo(withID: id)
     }
     
@@ -99,7 +101,13 @@ final class ToDoListInteractor: ToDoListInteractorInputProtocol, @unchecked Send
             forName: .NSManagedObjectContextDidSave,
             object: nil,
             queue: nil) { [weak self] _ in
-                self?.fetchToDos()
+                guard let self else { return }
+                
+                if let searchText {
+                    searchToDos(with: searchText)
+                } else {
+                    fetchToDos()
+                }
             }
     }
     

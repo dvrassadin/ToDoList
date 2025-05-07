@@ -12,7 +12,7 @@ protocol StorageManager {
     func saveToDo(_ toDo: ToDo)
     @preconcurrency
     func saveToDos(_ toDos: [ToDo])
-    func updateToDoCompletion(id: UUID, completed: Bool, completion: @escaping () -> Void)
+    func updateToDoCompletion(id: UUID, completed: Bool)
     func fetchToDos(completion: @escaping @Sendable ([ToDo]) -> Void)
     func fetchToDos(matching query: String, completion: @escaping @Sendable ([ToDo]) -> Void)
     func fetchToDo(withID id: UUID, completion: @escaping @Sendable (ToDo?) -> Void)

@@ -19,16 +19,17 @@ final class ToDoTableViewCell: UITableViewCell {
     private weak var delegate: ToDoTableViewCellDelegate?
     
     private var toDo: ToDo?
-    
-    private var toDoTopToTitleBottom: NSLayoutConstraint?
-    private var toDoTopToContentTop: NSLayoutConstraint?
-    private var dateTopToToDoBottom: NSLayoutConstraint?
-    private var dateBottomToContentBottom: NSLayoutConstraint?
-    private var toDoBottomToContentBottom: NSLayoutConstraint?
 
     // MARK: UI Components
     
     private let completeButton = UIButton(configuration: .plain())
+    
+    private let stackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 6
+        return stackView
+    }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -80,9 +81,10 @@ final class ToDoTableViewCell: UITableViewCell {
         selectionStyle = .none
         
         contentView.addSubview(completeButton)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(toDoLabel)
-        contentView.addSubview(dateLabel)
+        contentView.addSubview(stackView)
+        stackView.addArrangedSubview(titleLabel)
+        stackView.addArrangedSubview(toDoLabel)
+        stackView.addArrangedSubview(dateLabel)
         contentView.addSubview(separatorView)
         
         setUpConstraints()
@@ -90,16 +92,8 @@ final class ToDoTableViewCell: UITableViewCell {
     
     private func setUpConstraints() {
         completeButton.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        toDoLabel.translatesAutoresizingMaskIntoConstraints = false
-        dateLabel.translatesAutoresizingMaskIntoConstraints = false
+        stackView.translatesAutoresizingMaskIntoConstraints = false
         separatorView.translatesAutoresizingMaskIntoConstraints = false
-        
-        toDoTopToTitleBottom = toDoLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 6)
-        toDoTopToContentTop = toDoLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12)
-        dateTopToToDoBottom = dateLabel.topAnchor.constraint(equalTo: toDoLabel.bottomAnchor, constant: 6)
-        dateBottomToContentBottom = dateLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12)
-        toDoBottomToContentBottom = toDoLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12)
         
         NSLayoutConstraint.activate([
             completeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
@@ -107,15 +101,10 @@ final class ToDoTableViewCell: UITableViewCell {
             completeButton.heightAnchor.constraint(equalToConstant: 24),
             completeButton.widthAnchor.constraint(equalTo: completeButton.heightAnchor),
             
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            titleLabel.leadingAnchor.constraint(equalTo: completeButton.trailingAnchor, constant: 8),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            
-            toDoLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
-            toDoLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
-            
-            dateLabel.leadingAnchor.constraint(equalTo: toDoLabel.leadingAnchor),
-            dateLabel.trailingAnchor.constraint(equalTo: toDoLabel.trailingAnchor),
+            stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            stackView.leadingAnchor.constraint(equalTo: completeButton.trailingAnchor, constant: 8),
+            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
             
             separatorView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             separatorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
@@ -131,47 +120,46 @@ final class ToDoTableViewCell: UITableViewCell {
         self.delegate = delegate
         
         if toDo.completed {
-            completeButton.configuration?.image = UIImage(systemName: "circle")
-            completeButton.configuration?.baseForegroundColor = .Brand.stroke
-        } else {
             completeButton.configuration?.image = UIImage(systemName: "checkmark.circle")
             completeButton.configuration?.baseForegroundColor = .Brand.yellow
+        } else {
+            completeButton.configuration?.image = UIImage(systemName: "circle")
+            completeButton.configuration?.baseForegroundColor = .Brand.stroke
         }
         
-        if let title = toDo.title {
-            toDoTopToTitleBottom?.isActive = true
+        if let title = toDo.title, !title.isEmpty {
             titleLabel.layer.opacity = toDo.completed ? 0.5 : 1
             if toDo.completed {
-                titleLabel.attributedText = NSAttributedString(string: title)
-            } else {
                 titleLabel.attributedText = NSAttributedString(
                     string: title,
                     attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue]
                 )
+            } else {
+                titleLabel.attributedText = NSAttributedString(string: title)
             }
+            titleLabel.isHidden = false
         } else {
-            toDoTopToContentTop?.isActive = true
+            titleLabel.isHidden = true
         }
         
-        toDoLabel.text = toDo.text
-        toDoLabel.layer.opacity = toDo.completed ? 0.5 : 1
+        if let text = toDo.text, !text.isEmpty {
+            toDoLabel.text = toDo.text
+            toDoLabel.layer.opacity = toDo.completed ? 0.5 : 1
+            toDoLabel.isHidden = false
+        } else {
+            toDoLabel.isHidden = true
+        }
         
         if let date = toDo.created {
             dateLabel.text = date.formatted(date: .numeric, time: .omitted)
-            dateBottomToContentBottom?.isActive = true
+            dateLabel.isHidden = false
         } else {
-            toDoBottomToContentBottom?.isActive = true
+            dateLabel.isHidden = true
         }
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        
-        toDoTopToTitleBottom?.isActive = false
-        toDoTopToContentTop?.isActive = false
-        dateTopToToDoBottom?.isActive = false
-        dateBottomToContentBottom?.isActive = false
-        toDoBottomToContentBottom?.isActive = false
         
         completeButton.configuration?.image = nil
         titleLabel.attributedText = nil

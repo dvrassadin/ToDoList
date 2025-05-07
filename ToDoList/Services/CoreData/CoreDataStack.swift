@@ -83,7 +83,7 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
         }
     }
     
-    func updateToDoCompletion(id: UUID, completed: Bool, completion: @escaping () -> Void) {
+    func updateToDoCompletion(id: UUID, completed: Bool) {
         persistentContainer.performBackgroundTask { [weak self] backgroundContext in
             let request = CoreDataToDo.fetchRequest()
             request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
@@ -94,7 +94,6 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
                 
                 guard let toDo = results.first else {
                     self?.logger.error("ToDo \(id) not found for update.")
-                    completion()
                     return
                 }
                 
@@ -104,8 +103,6 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
             } catch {
                 self?.logger.error("Failed to update ToDo \(id): \(error.localizedDescription)")
             }
-            
-            completion()
         }
     }
     

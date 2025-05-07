@@ -162,10 +162,7 @@ extension ToDoListViewController: UITableViewDelegate {
                 image: UIImage(systemName: "trash"),
                 attributes: .destructive
             ) { _ in
-                self.presenter.didRequestDeleteToDo(
-                    withID: toDo.id,
-                    searchText: self.searchController.searchBar.text
-                )
+                self.presenter.didRequestDeleteToDo(withID: toDo.id)
             }
             
             return UIMenu(children: [edit, share, delete])
@@ -203,10 +200,6 @@ extension ToDoListViewController: UISearchBarDelegate {
 
 extension ToDoListViewController: ToDoTableViewCellDelegate {
     func toggleCompleted(toDo: ToDo) {
-        presenter.didTapCompleteButton(
-            id: toDo.id,
-            completed: !toDo.completed,
-            searchText: searchController.searchBar.text ?? ""
-        )
+        presenter.didTapCompleteButton(id: toDo.id, completed: !toDo.completed)
     }
 }

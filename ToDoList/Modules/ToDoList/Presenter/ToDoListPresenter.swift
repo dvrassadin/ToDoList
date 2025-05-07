@@ -11,10 +11,10 @@ protocol ToDoListPresenterProtocol: Sendable {
     func viewDidLoad()
     func didTapAddTask()
     func didSelectToDo(withID id: UUID)
-    func didTapCompleteButton(id: UUID, completed: Bool, searchText: String)
+    func didTapCompleteButton(id: UUID, completed: Bool)
     func didEnterSearchText(_ text: String?)
     func didCancelSearch()
-    func didRequestDeleteToDo(withID id: UUID, searchText: String?)
+    func didRequestDeleteToDo(withID id: UUID)
 }
 
 protocol ToDoListInteractorOutputProtocol: AnyObject, Sendable {
@@ -57,8 +57,8 @@ final class ToDoListPresenter: ToDoListPresenterProtocol, ToDoListInteractorOutp
         }
     }
     
-    func didTapCompleteButton(id: UUID, completed: Bool, searchText: String) {
-        interactor.markToDoAsCompleted(withId: id, completed: completed, searchText: searchText)
+    func didTapCompleteButton(id: UUID, completed: Bool) {
+        interactor.markToDoAsCompleted(withId: id, completed: completed)
     }
     
     func didEnterSearchText(_ text: String?) {
@@ -69,8 +69,8 @@ final class ToDoListPresenter: ToDoListPresenterProtocol, ToDoListInteractorOutp
         interactor.fetchToDos()
     }
     
-    func didRequestDeleteToDo(withID id: UUID, searchText: String?) {
-        interactor.deleteToDo(withId: id, searchText: searchText ?? "")
+    func didRequestDeleteToDo(withID id: UUID) {
+        interactor.deleteToDo(withId: id)
     }
     
     // MARK: ToDoListInteractorOutputProtocol Methods
