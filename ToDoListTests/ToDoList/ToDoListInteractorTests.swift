@@ -43,7 +43,7 @@ final class ToDoListInteractorTests: XCTestCase {
         super.tearDown()
     }
     
-    // MARK: fetchToDos tests
+    // MARK: Fetch ToDos tests
     
     func testFetchToDos_callsStorageManager_whenNetworkServiceWasCalled() {
         userDefaultsManager.hasLoadedTodos = true
@@ -95,6 +95,8 @@ final class ToDoListInteractorTests: XCTestCase {
         XCTAssertTrue(networkService.getToDosWasCalled)
     }
     
+    // MARK: Search ToDos Tests
+    
     func testSearchToDos_callsFetchMatchingWithQuery() {
         let expectation = XCTestExpectation(description: "Fetched matching todos")
         let expectedQuery = "test"
@@ -111,6 +113,8 @@ final class ToDoListInteractorTests: XCTestCase {
         XCTAssertTrue(presenter.didFetchToDosWasCalled)
     }
     
+    // MARK: Mark ToDo As Completed Tests
+    
     func testMarkToDoAsCompleted_callsStorageUpdateToDoCompletion() {
         let expectedID = UUID()
         
@@ -118,6 +122,8 @@ final class ToDoListInteractorTests: XCTestCase {
         
         XCTAssertEqual(storageManager.capturedID, expectedID)
     }
+    
+    // MARK: Delete ToDo Tests
     
     func testDeleteToDo_callsStorageDelete() {
         let expectedID = UUID()

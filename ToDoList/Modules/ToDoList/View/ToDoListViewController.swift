@@ -89,7 +89,7 @@ final class ToDoListViewController: UIViewController, ToDoListViewProtocol {
     
     private func setupView() {
         contentView.addToDoButton.addAction(UIAction { [weak self] _ in
-            self?.presenter.didTapAddTask()
+            self?.presenter.didTapAddToDo()
         }, for: .touchUpInside)
     }
     
