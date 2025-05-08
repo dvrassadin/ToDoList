@@ -12,7 +12,7 @@ struct ToDo: Hashable {
     let title: String?
     let text: String?
     let created: Date?
-    var completed: Bool
+    let completed: Bool
     
     init(id: UUID, title: String?, text: String?, created: Date?, completed: Bool) {
         self.id = id

@@ -106,7 +106,7 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
         }
     }
     
-    func fetchToDos(completion: @escaping @Sendable ([ToDo]) -> Void) {
+    func fetchToDos(completion: @escaping ([ToDo]) -> Void) {
         persistentContainer.performBackgroundTask { [weak self] backgroundContext in
             let request = CoreDataToDo.fetchRequest()
             
@@ -129,7 +129,7 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
         }
     }
     
-    func fetchToDos(matching query: String, completion: @escaping @Sendable ([ToDo]) -> Void) {
+    func fetchToDos(matching query: String, completion: @escaping ([ToDo]) -> Void) {
         guard !query.isEmpty else {
             fetchToDos { toDos in
                 completion(toDos)
@@ -162,7 +162,7 @@ final class CoreDataStack: StorageManager, @unchecked Sendable {
         }
     }
     
-    func fetchToDo(withID id: UUID, completion: @escaping @Sendable (ToDo?) -> Void) {
+    func fetchToDo(withID id: UUID, completion: @escaping (ToDo?) -> Void) {
         persistentContainer.performBackgroundTask { [weak self] backgroundContext in
             let request = CoreDataToDo.fetchRequest()
             request.predicate = NSPredicate(format: "id == %@", id as CVarArg)

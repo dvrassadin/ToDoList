@@ -174,7 +174,6 @@ extension ToDoListViewController: UITableViewDelegate {
         willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
         animator: UIContextMenuInteractionCommitAnimating
     ) {
-        // TODO: Implement AddEditVC opening
         animator.addCompletion {
             guard let stringID = configuration.identifier as? String,
                   let uuid = UUID(uuidString: stringID) else { return }
